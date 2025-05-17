@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Selamat Guforn!</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f0f8ff;
+      text-align: center;
+      padding: 50px;
+      overflow-x: hidden;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      position: relative;
+    }
+    h1 {
+      color: #4caf50;
+      font-size: 32px;
+    }
+    #message {
+      font-size: 18px;
+      color: #333;
+      margin-top: 20px;
+      min-height: 100px;
+    }
+    .emoji {
+      font-size: 32px;
+      margin-top: 20px;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+    #music-control {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Selamat ya, Guforn! 🎓</h1>
+    <div id="message"></div>
+    <div class="emoji">🌟🔥💪</div>
+    <div id="music-control">
+      <button onclick="toggleMusic()">🔊 Mainkan / Jeda Musik</button>
+    </div>
+  </div>
+
+  <canvas id="confetti"></canvas>
+
+  <!-- Musik -->
+  <audio id="bg-music" src="musik-latar.mp3" loop></audio>
+
+  <script>
+    // Mesin tik efek
+    const messageEl = document.getElementById("message");
+    const text = "Hari ini adalah bukti kerja kerasmu selama ini!\nSemoga seminar proposalnya lancar dan sukses selalu.\nBangga punya temen sekeren kamu! ✨";
+    let index = 0;
+
+    function typeWriter() {
+      if (index < text.length) {
+        messageEl.innerHTML += text.charAt(index) === '\n' ? "<br>" : text.charAt(index);
+        index++;
+        setTimeout(typeWriter, 50);
+      }
+    }
+
+    // Confetti
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confettis = Array.from({ length: 150 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 6 + 4,
+      d: Math.random() * 30 + 10,
+      color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+      tilt: Math.random() * 10 - 10,
+      tiltAngle: 0,
+      tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+    }));
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      confettis.forEach(confetti => {
+        ctx.beginPath();
+        ctx.lineWidth = confetti.r / 2;
+        ctx.strokeStyle = confetti.color;
+        ctx.moveTo(confetti.x + confetti.tilt + confetti.r / 4, confetti.y);
+        ctx.lineTo(confetti.x + confetti.tilt, confetti.y + confetti.tilt + confetti.r / 4);
+        ctx.stroke();
+      });
+
+      updateConfetti();
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function updateConfetti() {
+      confettis.forEach(c => {
+        c.y += Math.cos(c.d) + 2;
+        c.x += Math.sin(0);
+        c.tiltAngle += c.tiltAngleIncrement;
+        c.tilt = Math.sin(c.tiltAngle) * 15;
+
+        if (c.y > canvas.height) {
+          c.y = -10;
+          c.x = Math.random() * canvas.width;
+        }
+      });
+    }
+
+    // Musik
+    const music = document.getElementById("bg-music");
+    function toggleMusic() {
+      if (music.paused) {
+        music.play();
+      } else {
+        music.pause();
+      }
+    }
+
+    // Auto-play musik (note: beberapa browser butuh interaksi dulu)
+    window.onload = () => {
+      typeWriter();
+      drawConfetti();
+      // music.play(); // biasanya ini diblok oleh browser, makanya pakai tombol
+    };
+  </script>
+
+</body>
+</html>
